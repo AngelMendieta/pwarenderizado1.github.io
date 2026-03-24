@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" class="light dark">
+
+<head>
+
+ <meta charset="UTF-8">
+
+ <title>Inicio - PWA Renderizado</title>
+
+ <meta name="viewport" content="width=device-width">
+ <meta name="theme-color" content="#fffbfe">
+
+ <link rel="icon" sizes="32x32" href="favicon.ico">
+ <link rel="manifest" href="site.webmanifest">
+
+ <script src="ungap/custom-elements.js"></script>
+ <script type="module" src="js/lib/custom/md-app-bar.js"></script>
+ <script type="module" src="js/nav-tab-fixed.js"></script>
+
+ <!-- estilos -->
+
+<link rel="stylesheet" href="css/theme/light.css">
+<link rel="stylesheet" href="css/theme/dark.css">
+
+ <link rel="stylesheet" href="css/estilos.css">
+ <link rel="stylesheet" href="css/transicion_pestanas.css">
+ <link rel="stylesheet" href="css/md-tab.css">
+ <link rel="stylesheet" href="css/material-symbols-outlined.css">
+ <link rel="stylesheet" href="css/md-list.css">
+
+
+</head>
+
+<body>
+
+ <!-- APP BAR -->
+ <md-app-bar class="centered" adicional="tab">
+  <h1>Chistes</h1>
+ </md-app-bar>
+
+ <!-- NAVEGACIÓN -->
+ <nav-tab-fixed id="tab"></nav-tab-fixed>
+
+ <section>
+
+  <p class="md-body">
+   Selecciona un integrante del equipo para mostrar su chiste.
+  </p>
+
+  <form id="forma">
+   <ul class="md-list">
+
+    <li class="md-two-line">
+     <span class="headline">Integrante</span>
+     <span class="supporting">
+      <select name="integrante" required>
+       <option value="">Selecciona uno</option>
+       <option value="emiliano">Emiliano</option>
+       <option value="irvin">Irvin</option>
+       <option value="luis">Luis</option>
+       <option value="jesus">Jesus</option>
+       <option value="saul">Saul</option>
+      </select>
+     </span>
+    </li>
+
+    <li>
+     <button type="submit">Mostrar chiste</button>
+    </li>
+
+   </ul>
+  </form>
+
+  <!-- RESULTADO -->
+  <ul class="md-list" id="resultado"></ul>
+
+ </section>
+
+ <script type="module">
+
+  import { consume } from "./js/lib/consume.js"
+  import { enviaFormRecibeJson } from "./js/lib/enviaFormRecibeJson.js"
+  import { muestraError } from "./js/lib/muestraError.js"
+
+  const forma = document.getElementById("forma")
+  const resultado = document.getElementById("resultado")
+
+  forma.addEventListener("submit", submit)
+
+  async function submit(event) {
+   try {
+    event.preventDefault()
+
+    const respuesta = await consume(
+     enviaFormRecibeJson("php/procesa.php", forma)
+    )
+
+    const json = await respuesta.json()
+
+    resultado.innerHTML = `
+     <li class="md-two-line">
+      <span class="headline">${json.integrante}</span>
+      <span class="supporting">${json.chiste}</span>
+     </li>
+    `
+
+   } catch (error) {
+    muestraError(error)
+   }
+  }
+
+ </script>
+
+</body>
+</html>
